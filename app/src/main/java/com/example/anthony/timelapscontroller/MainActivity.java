@@ -35,6 +35,7 @@ import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 
+    public static final String EXECUTION_ID_KEY = "EXECUTION_ID_KEY";
     private List<Execution> executions = new ArrayList<>();
     private SimpleDateFormat sdf = new SimpleDateFormat("kk:mm dd/MM/yyyy");
     RecyclerView recyclerView;
@@ -187,7 +188,9 @@ public class MainActivity extends AppCompatActivity {
             myViewHolder.root.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    startActivity(new Intent(MainActivity.this,ConsultActivity.class));
+                    Intent intent = new Intent(MainActivity.this,ConsultActivity.class);
+                    intent.putExtra(EXECUTION_ID_KEY, i);
+                    startActivity(intent);
                 }
             });
         }
@@ -241,7 +244,12 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void onError(int i, ErrorResponse errorResponse) {
-
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        Toast.makeText(MainActivity.this, "Erreur lors du chargement des Executions", Toast.LENGTH_SHORT).show();
+                    }
+                });
             }
         });
     }
