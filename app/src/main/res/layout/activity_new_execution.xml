@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context=".NewExecutionActivity">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="43dp"
+        android:orientation="horizontal">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="30dp"
+            android:text="Nom de l'execution" />
+
+        <EditText
+            android:id="@+id/edittitle"
+            android:layout_width="200dp"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="20dp" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+        <Button
+            android:id="@+id/temps_debut"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:onClick="choisirTemps"
+            android:text="Choisir date début" />
+
+        <TextView
+            android:id="@+id/datedebuttext"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+        <Button
+            android:id="@+id/heure_debut"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:onClick="choisirfin"
+            android:text="Choisir date fin" />
+
+        <TextView
+            android:id="@+id/datefintext"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
+    </LinearLayout>
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="43dp"
+        android:orientation="horizontal">
+
+        <TextView
+            android:layout_width="102dp"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="30dp"
+            android:text="Fréquence" />
+
+        <EditText
+            android:id="@+id/editfrequency"
+            android:layout_width="wrap_content"
+            android:inputType="number"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="20dp" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="43dp"
+        android:orientation="horizontal">
+
+        <TextView
+            android:layout_width="138dp"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="30dp"
+            android:text="Nombre de photos : " />
+
+        <TextView
+            android:id="@+id/nombrephoto"
+            android:layout_width="wrap_content"
+            android:inputType="number"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="20dp"
+            android:text="Nombre"/>
+    </LinearLayout>
+
+    <Button
+        android:id="@+id/Confirmer"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="250dp"
+        android:layout_marginTop="260dp"
+        android:baselineAligned="false"
+        android:text="Confirmer"
+        android:onClick="confirmation"/>
+
+
+</LinearLayout>
