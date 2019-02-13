@@ -92,3 +92,6 @@ lint/generated/
 lint/outputs/
 lint/tmp/
 # lint/reports/
+
+#added by me
+gradle_linux_files/
