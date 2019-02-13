@@ -20,10 +20,28 @@
 
     </android.support.design.widget.AppBarLayout>
 
-    <android.support.v4.view.ViewPager
-        android:id="@+id/VP"
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"></android.support.v4.view.ViewPager>
+        android:layout_height="match_parent"
+        android:layout_marginTop="?attr/actionBarSize"
+        android:orientation="vertical">
 
+        <android.support.v4.view.ViewPager
+            android:id="@+id/VP"
+            android:layout_width="match_parent"
+            android:layout_height="200dp"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:id="@+id/nbImagesText"
+            android:layout_gravity="center_horizontal"
+            android:textSize="20sp"
+            android:textColor="#000"
+            android:text="Chargement..."
+            />
+
+    </LinearLayout>
 
 </android.support.design.widget.CoordinatorLayout>

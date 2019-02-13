@@ -7,6 +7,7 @@ import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.app4.project.timelapse.api.client.Callback;
@@ -18,6 +19,7 @@ public class PhotoActivity extends AppCompatActivity {
 
     private TimelapseClient client;
     ViewPager viewpager;
+    TextView textView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -30,34 +32,36 @@ public class PhotoActivity extends AppCompatActivity {
 
 
         viewpager = (ViewPager) findViewById(R.id.VP);
+        textView = (TextView) findViewById(R.id.nbImagesText);
         final int executionId = getIntent().getIntExtra(MainActivity.EXECUTION_ID_KEY, 0);
-        client.getExecution(executionId, new Callback<Execution>() {
+        client.getImagesCount(executionId, new Callback<Integer>() {
             @Override
-            public void onSuccess(int i, final Execution execution) {
+            public void onSuccess(int responseCode, final Integer nbImages) {
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        //TODO REMPLIR LES CHAMPS DE L'ACTIVITE (nom de l'execution, heure de debut, etc...)
-                        //...
-
+                        ViewPageAdapter viewPageAdapter = new ViewPageAdapter(PhotoActivity.this, executionId, nbImages);
+                        viewpager.setAdapter(viewPageAdapter);
+                        String formatText = nbImages  == 1 ?
+                                "Il y a %d image" :
+                                "Il y a %d images";
+                        textView.setText(String.format(formatText, nbImages));
                     }
                 });
             }
 
             @Override
-            public void onError(int i, ErrorResponse errorResponse) {
+            public void onError(int responseCode, ErrorResponse errorResponse) {
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        Toast.makeText(PhotoActivity.this, "Erreur lors du chargement de l'execution", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(PhotoActivity.this, "Erreur lors du chargement des images", Toast.LENGTH_SHORT).show();
                     }
                 });
             }
         });
 
-        ViewPageAdapter viewPageAdapter = new ViewPageAdapter(this);
 
-        viewpager.setAdapter(viewPageAdapter);
     }
 
 }
