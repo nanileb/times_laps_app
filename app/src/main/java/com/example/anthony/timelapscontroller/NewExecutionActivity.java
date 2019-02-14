@@ -7,6 +7,8 @@ import android.support.annotation.NonNull;
 import android.support.annotation.RequiresApi;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
 import android.widget.DatePicker;
@@ -34,9 +36,15 @@ public class NewExecutionActivity extends AppCompatActivity {
     private TextView textdatefin;
     private TimelapseClient client;
     private EditText edittitre;
+    private EditText frequency;
+    private String Freq;
+    private Long Calcul;
+    private double calc;
+    private TextView nbphoto;
     //private TextView nombrephoto;
     //private EditText editfrequency;
     //private int calcul;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,12 +54,43 @@ public class NewExecutionActivity extends AppCompatActivity {
         textdatefin = findViewById(R.id.datefintext);
         client  = ClientSingleton.getClient();
         edittitre=findViewById(R.id.edittitle);
+        frequency=findViewById(R.id.editfrequency);
+        nbphoto=findViewById(R.id.nombrephoto);
         //nombrephoto=findViewById(R.id.nombrephoto);
         //editfrequency=findViewById(R.id.editfrequency);
         //String result = editfrequency.toString();
         //Long nombre = nombrephoto.toString();
         //nombrephoto = (execution.getStartTime()-execution.getEndTime()/result;
+
+
+        frequency.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                if (s.toString().isEmpty()) {
+                    return;
+                }
+                execution.setFrequency(Long.parseLong(s.toString()));
+                if( execution.getFrequency()==0){
+                    return;
+                }
+                Calcul = (execution.getEndTime()-execution.getStartTime())/(1000 *execution.getFrequency());
+                nbphoto.setText(Calcul.toString());
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+
+            }
+        });
+
+
     }
+
 
     @RequiresApi(api = Build.VERSION_CODES.N)
     public void choisirTemps(final View v) {
@@ -68,8 +107,8 @@ public class NewExecutionActivity extends AppCompatActivity {
                         date.setHours( hourOfDay);
                         date.setMinutes(minute);
                         execution.setStartTime(date.getTime());
+
                         textdatedebut.setText(sdf.format(date));
-                        execution.setTitle(edittitre.getEditableText().toString());
 
                     }
                 }, date.getHours(), date.getMinutes(), true);
@@ -108,6 +147,23 @@ public class NewExecutionActivity extends AppCompatActivity {
 
 
     public void confirmation(final View v){
+        execution.setTitle(edittitre.getEditableText().toString());
+
+
+        if(execution.getTitle()==null || execution.getTitle().trim().isEmpty()){
+            Toast.makeText(NewExecutionActivity.this,"Veuillez mettre un titre", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        String f = frequency.getEditableText().toString();
+
+        if(f.trim().isEmpty()){
+            Toast.makeText(NewExecutionActivity.this,"Veuillez mettre une fréquence", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        execution.setFrequency(Long.parseLong(f));
+
 
         if (execution.getStartTime()<execution.getEndTime()){
         client.postExecution(execution, new Callback<Execution>() {

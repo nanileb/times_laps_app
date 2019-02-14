@@ -24,6 +24,8 @@
             android:layout_width="200dp"
             android:layout_height="wrap_content"
             android:layout_marginLeft="20dp"
+            android:singleLine="true"
+            android:maxLength="19"
             />
     </LinearLayout>
 
@@ -78,7 +80,7 @@
             android:layout_height="wrap_content"
             android:layout_marginLeft="30dp"
             android:textAlignment="center"
-            android:text="Fréquence" />
+            android:text="Fréquence (s)" />
 
         <EditText
             android:id="@+id/editfrequency"
@@ -102,12 +104,13 @@
             android:textAlignment="center"
             />
 
-        <EditText
+        <TextView
             android:id="@+id/nombrephoto"
             android:layout_width="wrap_content"
             android:inputType="number"
             android:layout_height="wrap_content"
             android:layout_marginLeft="20dp"
+            android:text="Nombre"
             />
     </LinearLayout>
 
@@ -115,11 +118,11 @@
         android:id="@+id/Confirmer"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="250dp"
-        android:layout_marginTop="260dp"
+        android:layout_marginLeft="150dp"
+        android:layout_marginTop="180dp"
         android:baselineAligned="false"
-        android:text="Confirmer"
-        android:onClick="confirmation"/>
+        android:onClick="confirmation"
+        android:text="Confirmer" />
 
 
 </LinearLayout>
