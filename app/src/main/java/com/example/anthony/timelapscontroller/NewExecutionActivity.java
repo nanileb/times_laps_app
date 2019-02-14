@@ -110,6 +110,9 @@ public class NewExecutionActivity extends AppCompatActivity {
 
                         textdatedebut.setText(sdf.format(date));
 
+                        Calcul = (execution.getEndTime()-execution.getStartTime())/(1000 *execution.getFrequency());
+                        nbphoto.setText(Calcul.toString());
+
                     }
                 }, date.getHours(), date.getMinutes(), true);
                 timePickerDialog.show();
@@ -136,6 +139,9 @@ public class NewExecutionActivity extends AppCompatActivity {
                         date.setMinutes(minute);
                         execution.setEndTime(date.getTime());
                         textdatefin.setText(sdf.format(date));
+
+                        Calcul = (execution.getEndTime()-execution.getStartTime())/(1000 *execution.getFrequency());
+                        nbphoto.setText(Calcul.toString());
                     }
                 }, date.getHours(), date.getMinutes(), true);
                 timePickerDialog.show();
