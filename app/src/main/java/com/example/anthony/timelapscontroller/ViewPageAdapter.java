@@ -44,6 +44,11 @@ public class ViewPageAdapter extends PagerAdapter {
         this.executionId = executionId;
     }
 
+    //to run on UI thread
+    public void updateCount(int nbImages) {
+        this.nbImages = nbImages;
+        notifyDataSetChanged();
+    }
     @Override
     public int getCount() {
         return nbImages;
