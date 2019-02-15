@@ -65,6 +65,43 @@ public class ConsultActivity extends AppCompatActivity {
             }
         });
 
+        Button supprimer = (Button) findViewById(R.id.Delete);
+
+        supprimer.setOnClickListener(new View.OnClickListener(){
+            @Override
+            //On click function
+            public void onClick(View view) {
+                //Create the intent to start another activity
+                client.deleteExecution(executionId, new Callback<Boolean>() {
+                    @Override
+                    public void onSuccess(int i, final Boolean success) {
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                if (success) {
+                                    Toast.makeText(getApplicationContext(), "L'execution a bien ete supprimée", Toast.LENGTH_SHORT).show();
+                                    finish();
+                                } else {
+                                    Toast.makeText(ConsultActivity.this, "L'execution n'a pas pu être suprimée", Toast.LENGTH_SHORT).show();
+                                }
+                            }
+                        });
+                    }
+
+                    @Override
+                    public void onError(int i, ErrorResponse errorResponse) {
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                Toast.makeText(ConsultActivity.this, "Une erreur est survenue, veuillez reessayer", Toast.LENGTH_SHORT).show();
+                            }
+                        });
+                    }
+                });
+            }
+        });
+
+
 
 }}
 
