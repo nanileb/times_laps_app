@@ -3,6 +3,7 @@ package com.example.anthony.timelapscontroller;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -13,6 +14,7 @@ import com.app4.project.timelapse.api.client.Callback;
 import com.app4.project.timelapse.api.client.TimelapseClient;
 import com.app4.project.timelapse.model.ErrorResponse;
 
+import java.util.Locale;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
@@ -73,7 +75,30 @@ public class PhotoActivity extends AppCompatActivity {
 
 
         viewpager = (ViewPager) findViewById(R.id.VP);
+        final TextView imageIndexText = (TextView) findViewById(R.id.imageIndexText);
+        viewpager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+            @Override
+            public void onPageScrolled(int i, float v, int i1) {
+
+            }
+
+            @Override
+            public void onPageSelected(int i) {
+                PagerAdapter adapter = viewpager.getAdapter();
+                int count = 0;
+                if (adapter != null) {
+                    count = adapter.getCount();
+                }
+                imageIndexText.setText(String.format(Locale.getDefault(), "image %d sur %d", i + 1, count));
+            }
+
+            @Override
+            public void onPageScrollStateChanged(int i) {
+
+            }
+        });
         textView = (TextView) findViewById(R.id.nbImagesText);
+
         executionId = getIntent().getIntExtra(MainActivity.EXECUTION_ID_KEY, 0);
         client.getImagesCount(executionId, new Callback<Integer>() {
             @Override
@@ -82,6 +107,8 @@ public class PhotoActivity extends AppCompatActivity {
                     @Override
                     public void run() {
                         viewPageAdapter = new ViewPageAdapter(PhotoActivity.this, executionId, nbImages);
+                        imageIndexText.setText(String.format(Locale.getDefault(), "image %d sur %d", 1, nbImages));
+
                         viewpager.setAdapter(viewPageAdapter);
                         textView.setText(nbImagesText(nbImages));
                     }
@@ -123,9 +150,7 @@ public class PhotoActivity extends AppCompatActivity {
     }
 
     private String nbImagesText(int nbImages) {
-        String text = nbImages  == 1 ?
-                "Il y a %d image" :
-                "Il y a %d images";
+        String text = "Il y a %d " + ( nbImages  == 1 ? "image" : "images");
         return String.format(text, nbImages);
     }
 }

@@ -12,6 +12,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 
 import com.app4.project.timelapse.api.client.Callback;
 import com.app4.project.timelapse.api.client.TimelapseClient;
@@ -66,7 +67,8 @@ public class ViewPageAdapter extends PagerAdapter {
         layoutInflater = (LayoutInflater) activity.getSystemService(Activity.LAYOUT_INFLATER_SERVICE);
         View view = layoutInflater.inflate(R.layout.custom_layout, null);
         final ImageView imageView = (ImageView) view.findViewById(R.id.imageView);
-        imageView.setImageResource(R.drawable.loading);
+        final ProgressBar progressBar = (ProgressBar) view.findViewById(R.id.imageProgressBar);
+        progressBar.setVisibility(View.VISIBLE);
         //TODO (pour Nelson) les images sont coupees
 
         client.getImage(bitmapResponseHandler, new Callback<Bitmap>() {
@@ -76,6 +78,7 @@ public class ViewPageAdapter extends PagerAdapter {
                     @Override
                     public void run() {
                         imageView.setImageBitmap(bitmap);
+                        progressBar.setVisibility(View.INVISIBLE);
                     }
                 });
             }
@@ -86,11 +89,11 @@ public class ViewPageAdapter extends PagerAdapter {
                     @Override
                     public void run() {
                         imageView.setImageResource(R.drawable.error);
+                        progressBar.setVisibility(View.INVISIBLE);
                     }
                 });
             }
         }, executionId, position);
-     //   imageView.setImageResource(images[position]);
 
         ViewPager Vp2 = (ViewPager) container;
         Vp2.addView(view, 0);
