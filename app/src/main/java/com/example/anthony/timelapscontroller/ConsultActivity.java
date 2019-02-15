@@ -89,11 +89,11 @@ public class ConsultActivity extends AppCompatActivity {
                     }
 
                     @Override
-                    public void onError(int i, ErrorResponse errorResponse) {
+                    public void onError(int i, final ErrorResponse errorResponse) {
                         runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
-                                Toast.makeText(ConsultActivity.this, "Une erreur est survenue, veuillez reessayer", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(ConsultActivity.this, "Une erreur est survenue: " + errorResponse.getTitle(), Toast.LENGTH_SHORT).show();
                             }
                         });
                     }

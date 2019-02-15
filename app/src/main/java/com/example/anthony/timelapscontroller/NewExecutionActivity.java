@@ -5,6 +5,7 @@ import android.app.TimePickerDialog;
 import android.os.Build;
 import android.support.annotation.NonNull;
 import android.support.annotation.RequiresApi;
+import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.Editable;
@@ -37,9 +38,7 @@ public class NewExecutionActivity extends AppCompatActivity {
     private TimelapseClient client;
     private EditText edittitre;
     private EditText frequency;
-    private String Freq;
-    private Long Calcul;
-    private double calc;
+    private Long Calcul = 0L;
     private TextView nbphoto;
     //private TextView nombrephoto;
     //private EditText editfrequency;
@@ -75,10 +74,7 @@ public class NewExecutionActivity extends AppCompatActivity {
                     return;
                 }
                 execution.setFrequency(Long.parseLong(s.toString()));
-                if( execution.getFrequency()==0){
-                    return;
-                }
-                Calcul = (execution.getEndTime()-execution.getStartTime())/(1000 *execution.getFrequency());
+                updateCalcul();
                 nbphoto.setText(Calcul.toString());
             }
 
@@ -110,7 +106,7 @@ public class NewExecutionActivity extends AppCompatActivity {
 
                         textdatedebut.setText(sdf.format(date));
 
-                        Calcul = (execution.getEndTime()-execution.getStartTime())/(1000 *execution.getFrequency());
+                        updateCalcul();
                         nbphoto.setText(Calcul.toString());
 
                     }
@@ -140,7 +136,7 @@ public class NewExecutionActivity extends AppCompatActivity {
                         execution.setEndTime(date.getTime());
                         textdatefin.setText(sdf.format(date));
 
-                        Calcul = (execution.getEndTime()-execution.getStartTime())/(1000 *execution.getFrequency());
+                        updateCalcul();
                         nbphoto.setText(Calcul.toString());
                     }
                 }, date.getHours(), date.getMinutes(), true);
@@ -178,18 +174,23 @@ public class NewExecutionActivity extends AppCompatActivity {
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        Toast.makeText(NewExecutionActivity.this, "Success", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getApplicationContext(), "Success", Toast.LENGTH_SHORT).show();
+                        finish();
                     }
                 });
             }
 
             @Override
-            public void onError(int i, ErrorResponse errorResponse) {
-                Log.e("fdyfyf", errorResponse.getMessage());
+            public void onError(int i, final ErrorResponse errorResponse) {
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        Snackbar.make(textdatedebut, "Une erreur est survenue: " + errorResponse.getTitle(), Snackbar.LENGTH_LONG).show();
+                    }
+                });
             }
 
         });
-            finish();
         }
         else{
             Toast.makeText(NewExecutionActivity.this,"La date de début est supérieur à la date de fin !!", Toast.LENGTH_SHORT).show();
@@ -200,4 +201,9 @@ public class NewExecutionActivity extends AppCompatActivity {
 
     }
 
+    private void updateCalcul() {
+        if (execution.getFrequency() > 0) {
+            Calcul = (execution.getEndTime()-execution.getStartTime())/(1000 *execution.getFrequency());
+        }
+    }
 }
