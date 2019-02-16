@@ -181,7 +181,7 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         public void onBindViewHolder(@NonNull MyViewHolder myViewHolder, final int i) {
-            Execution execution = executions.get(i);
+            final Execution execution = executions.get(i);
             myViewHolder.title.setText(execution.getTitle());
             myViewHolder.dateCommencement.setText("Début: " + sdf.format(new Date(execution.getStartTime())));
             myViewHolder.datefin.setText("Fin: " + sdf.format(new Date(execution.getEndTime())));
@@ -189,7 +189,7 @@ public class MainActivity extends AppCompatActivity {
                 @Override
                 public void onClick(View v) {
                     Intent intent = new Intent(MainActivity.this,ConsultActivity.class);
-                    intent.putExtra(EXECUTION_ID_KEY, i);
+                    intent.putExtra(EXECUTION_ID_KEY, execution.getId());
                     startActivity(intent);
                 }
             });

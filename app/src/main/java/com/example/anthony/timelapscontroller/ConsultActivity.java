@@ -41,11 +41,11 @@ public class ConsultActivity extends AppCompatActivity {
             }
 
             @Override
-            public void onError(int i, ErrorResponse errorResponse) {
+            public void onError(int i, final ErrorResponse errorResponse) {
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        Toast.makeText(ConsultActivity.this, "Erreur lors du chargement de l'execution", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(ConsultActivity.this, "Erreur lors du chargement de l'execution: " + errorResponse.getMessage(), Toast.LENGTH_SHORT).show();
                     }
                 });
             }
