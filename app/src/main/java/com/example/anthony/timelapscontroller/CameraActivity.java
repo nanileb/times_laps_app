@@ -21,6 +21,7 @@ public class CameraActivity extends AppCompatActivity {
     private TimelapseClient client;
     private ScheduledFuture scheduledFuture;
     private ScheduledExecutorService executor;
+    private CameraState cameraState;
     private final Runnable getCameraState = new Runnable() {
         @Override
         public void run() {
@@ -30,7 +31,9 @@ public class CameraActivity extends AppCompatActivity {
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
+                            CameraActivity.this.cameraState = cameraState;
                             updateCameraView(cameraState);
+                            //TODO Nelson: changer le name du bouton SLEEP/WAKE UP
                         }
                     });
                 }
@@ -78,14 +81,18 @@ public class CameraActivity extends AppCompatActivity {
 
     private void updateCameraView(CameraState cameraState) {
         //TODO mettre a jour la valeur des Textview qui affiche les données dans Camerastate
-    }
+        // utilise cameraState.isTurnedOn() pour savoir si la camera est allumée
+        // utilise cameraState.isSleeping() pour savoir si la camera est en veille
+        // utilise cameraState.getLastTimeAlive() pour avoir le dernier signe de vie (un long qu'il faut convertir en string avec un SimpleDateFormat, comme dans la MainActivity)
 
-    public void onWakeUpClick(View v) {
-        onCommandClick(Command.WAKE_UP);
     }
 
     public void onSleepClick(View v) {
-        onCommandClick(Command.SLEEP);
+        if (cameraState != null && !cameraState.isSleeping()) {
+            onCommandClick(Command.WAKE_UP);
+        } else {
+            onCommandClick(Command.SLEEP);
+        }
     }
 
     public void onTurnOffClick(View v) {

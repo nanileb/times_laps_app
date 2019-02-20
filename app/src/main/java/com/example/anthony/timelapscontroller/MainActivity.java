@@ -37,7 +37,7 @@ public class MainActivity extends AppCompatActivity {
 
     public static final String EXECUTION_ID_KEY = "EXECUTION_ID_KEY";
     private List<Execution> executions = new ArrayList<>();
-    private SimpleDateFormat sdf = new SimpleDateFormat("kk:mm dd/MM/yyyy");
+    private SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy kk:mm");
     RecyclerView recyclerView;
     private ExecutionAdapter adapter;
     TextView Textinvisible1,Texinvisible2;
