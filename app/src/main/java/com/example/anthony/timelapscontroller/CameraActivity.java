@@ -100,6 +100,7 @@ public class CameraActivity extends AppCompatActivity {
                     @Override
                     public void run() {
                         Toast.makeText(CameraActivity.this, "La commande a bien été envoyée", Toast.LENGTH_SHORT).show();
+                        getCameraState.run();
                     }
                 });
             }
