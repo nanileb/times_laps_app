@@ -1,5 +1,6 @@
 package com.example.anthony.timelapscontroller;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -7,6 +8,8 @@ import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.view.View;
+import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -30,8 +33,9 @@ public class PhotoActivity extends AppCompatActivity {
     ViewPager viewpager;
     TextView textView;
     private int executionId;
+    private Button videoButton;
     private ViewPageAdapter viewPageAdapter;
-    private final ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
+    private ScheduledExecutorService executor;
     private ScheduledFuture scheduledFuture;
     private final Runnable getImageTask = new Runnable() {
         @Override
@@ -44,6 +48,7 @@ public class PhotoActivity extends AppCompatActivity {
                         public void run() {
                             textView.setText(nbImagesText(nbImages));
                             viewPageAdapter.updateCount(nbImages);
+                            videoButton.setVisibility(nbImages > 1 ? View.VISIBLE : View.GONE);
                         }
                     });
                 }
@@ -71,10 +76,11 @@ public class PhotoActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
+        executor = Executors.newSingleThreadScheduledExecutor();
         client = ClientSingleton.getClient();
 
-
         viewpager = (ViewPager) findViewById(R.id.VP);
+        videoButton = findViewById(R.id.voir_video);
         final TextView imageIndexText = (TextView) findViewById(R.id.imageIndexText);
         viewpager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
             @Override
@@ -107,10 +113,12 @@ public class PhotoActivity extends AppCompatActivity {
                     @Override
                     public void run() {
                         viewPageAdapter = new ViewPageAdapter(PhotoActivity.this, executionId, nbImages);
-                        imageIndexText.setText(String.format(Locale.getDefault(), "image %d sur %d", 1, nbImages));
+                        imageIndexText.setText(nbImages == 0 ? "Pas d'images" :
+                                String.format(Locale.getDefault(), "image %d sur %d", 1, nbImages));
 
                         viewpager.setAdapter(viewPageAdapter);
                         textView.setText(nbImagesText(nbImages));
+                        videoButton.setVisibility(nbImages > 1 ? View.VISIBLE : View.GONE);
                     }
                 });
             }
@@ -152,5 +160,11 @@ public class PhotoActivity extends AppCompatActivity {
     private String nbImagesText(int nbImages) {
         String text = "Il y a %d " + ( nbImages  == 1 ? "image" : "images");
         return String.format(text, nbImages);
+    }
+
+    public void videoActivity(View v) {
+        Intent intent = new Intent(this, VideoActivity.class);
+        intent.putExtra(MainActivity.EXECUTION_ID_KEY, executionId);
+        startActivity(intent);
     }
 }

@@ -7,7 +7,6 @@ import android.graphics.BitmapFactory;
 import android.support.annotation.NonNull;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,13 +16,11 @@ import android.widget.ProgressBar;
 import com.app4.project.timelapse.api.client.Callback;
 import com.app4.project.timelapse.api.client.TimelapseClient;
 import com.app4.project.timelapse.model.ErrorResponse;
-import com.squareup.picasso.Picasso;
 import com.tambapps.http.restclient.request.handler.response.ResponseHandler;
 
 import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.List;
 
 public class ViewPageAdapter extends PagerAdapter {
 
@@ -47,8 +44,10 @@ public class ViewPageAdapter extends PagerAdapter {
 
     //to run on UI thread
     public void updateCount(int nbImages) {
-        this.nbImages = nbImages;
-        notifyDataSetChanged();
+        if (this.nbImages != nbImages) {
+            this.nbImages = nbImages;
+            notifyDataSetChanged();
+        }
     }
     @Override
     public int getCount() {
