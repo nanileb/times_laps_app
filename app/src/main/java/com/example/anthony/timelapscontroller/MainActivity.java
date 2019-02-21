@@ -40,9 +40,6 @@ public class MainActivity extends AppCompatActivity {
     private SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy kk:mm");
     RecyclerView recyclerView;
     private ExecutionAdapter adapter;
-    TextView Textinvisible1,Texinvisible2;
-    Animation FabOpen, FabClose, FabRclockwise,FabRanticlockwise;
-    boolean isOpen = false;
     private TimelapseClient client;
 
     @Override
@@ -62,45 +59,14 @@ public class MainActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
 
         final FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab_plus);
-        final FloatingActionButton fab_new = (FloatingActionButton) findViewById(R.id.fab_new);
-        final FloatingActionButton fab_new2 = (FloatingActionButton) findViewById(R.id.fab_new2);
 
-        Textinvisible1 = (TextView) findViewById(R.id.textinvisible);
-        Texinvisible2 =(TextView) findViewById(R.id.textinvisible2);
 
-        FabOpen = AnimationUtils.loadAnimation(getApplicationContext(),R.anim.fab_open);
-        FabClose = AnimationUtils.loadAnimation(getApplicationContext(),R.anim.fab_close);
-        FabRclockwise = AnimationUtils.loadAnimation(getApplicationContext(),R.anim.rotate_clockwise);
-        FabRanticlockwise = AnimationUtils.loadAnimation(getApplicationContext(),R.anim.rotate_anticlockwise);
 
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
-                if(isOpen)
-                {
-                    fab_new2.startAnimation(FabClose);
-                    fab_new.startAnimation(FabClose);
-                    Textinvisible1.startAnimation(FabClose);
-                    Texinvisible2.startAnimation(FabClose);
-                    fab.startAnimation(FabRanticlockwise);
-                    fab_new.setClickable(false);
-                    fab_new2.setClickable(false);
-                    isOpen=false;
-                }
-                else
-                {
-                    fab_new2.startAnimation(FabOpen);
-                    fab_new.startAnimation(FabOpen);
-                    Textinvisible1.startAnimation(FabOpen);
-                    Texinvisible2.startAnimation(FabOpen);
-                    fab.startAnimation(FabRclockwise);
-                    fab_new.setClickable(true);
-                    fab_new2.setClickable(true);
-                    isOpen=true;
-
-                }
-
+                startActivity(new Intent(MainActivity.this,NewExecutionActivity.class));
 
             }
         });
@@ -117,20 +83,6 @@ public class MainActivity extends AppCompatActivity {
         });
         */
 
-        fab_new2.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                startActivity(new Intent(MainActivity.this,NewExecutionActivity.class));
-            }
-        });
-
-
-        fab_new.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                startActivity(new Intent(MainActivity.this,ActionActivity.class));
-            }
-        });
 
 
 

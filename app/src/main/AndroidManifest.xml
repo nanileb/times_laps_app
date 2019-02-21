@@ -24,7 +24,6 @@
             </intent-filter>
         </activity>
         <activity android:name=".NewExecutionActivity" />
-        <activity android:name=".ActionActivity" />
         <activity android:name=".ConsultActivity" />
         <activity android:name=".ModifyActivity" />
         <activity
