@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.os.Build;
 import android.provider.Contacts;
 import android.support.annotation.RequiresApi;
+import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.Editable;
@@ -38,6 +39,7 @@ public class ConsultActivity extends AppCompatActivity {
     private EditText frequency;
     private TextView textdatefin;
     private EditText edittitre;
+    private int executionId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -76,7 +78,7 @@ public class ConsultActivity extends AppCompatActivity {
             }
         });
 
-        final int executionId = getIntent().getIntExtra(MainActivity.EXECUTION_ID_KEY, 0);
+        executionId = getIntent().getIntExtra(MainActivity.EXECUTION_ID_KEY, 0);
         client.getExecution(executionId, new Callback<Execution>() {
             @Override
             public void onSuccess(int i, final Execution execution) {
@@ -217,9 +219,63 @@ public class ConsultActivity extends AppCompatActivity {
         datePickerDialog.show();
     }
 
+
+    public void Modification(final View v){
+        execution.setTitle(edittitre.getEditableText().toString());
+
+
+        if(execution.getTitle()==null || execution.getTitle().trim().isEmpty()){
+            Toast.makeText(ConsultActivity.this,"Veuillez mettre un titre", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        String f = frequency.getEditableText().toString();
+
+        if(f.trim().isEmpty()){
+            Toast.makeText(ConsultActivity.this,"Veuillez mettre une fréquence", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        execution.setFrequency(Long.parseLong(f));
+
+
+        if (execution.getStartTime()<execution.getEndTime()){
+            client.putExecution(executionId, execution, new Callback<Execution>() {
+                @Override
+                public void onSuccess(int i, Execution execution) {
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            Toast.makeText(getApplicationContext(), "Success", Toast.LENGTH_SHORT).show();
+                            finish();
+                        }
+                    });
+                }
+
+                @Override
+                public void onError(int i, final ErrorResponse errorResponse) {
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            Snackbar.make(textdatedebut, "Une erreur est survenue: " + errorResponse.getTitle(), Snackbar.LENGTH_LONG).show();
+                        }
+                    });
+                }
+
+            });
+        }
+        else{
+            Toast.makeText(ConsultActivity.this,"La date de début est supérieur à la date de fin !!", Toast.LENGTH_SHORT).show();
+        }
+
+
+
+
+    }
+
     private void updateCalcul() {
         if (execution.getFrequency() > 0) {
-            Calcul = (execution.getEndTime()-execution.getStartTime())/(1000 *execution.getFrequency());
+            Calcul = (execution.getEndTime()-execution.getStartTime()+4)/(1000 *execution.getFrequency());
         }
     }
 }
