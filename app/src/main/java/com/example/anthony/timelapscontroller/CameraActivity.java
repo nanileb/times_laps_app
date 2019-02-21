@@ -1,8 +1,10 @@
 package com.example.anthony.timelapscontroller;
 
+import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -28,6 +30,7 @@ public class CameraActivity extends AppCompatActivity {
     private TextView allume;
     private TextView veille;
     private TextView Signe_vie;
+    private Button veilleButton;
     private final Runnable getCameraState = new Runnable() {
         @Override
         public void run() {
@@ -39,7 +42,7 @@ public class CameraActivity extends AppCompatActivity {
                         public void run() {
                             CameraActivity.this.cameraState = cameraState;
                             updateCameraView(cameraState);
-                            //TODO Nelson: changer le name du bouton SLEEP/WAKE UP
+                            veilleButton.setText(cameraState.isSleeping() ? "REVEILLER" : "METTRE EN VEILLE");
                         }
                     });
                 }
@@ -68,6 +71,7 @@ public class CameraActivity extends AppCompatActivity {
         allume = (TextView) findViewById(R.id.Camera_On);
         veille = (TextView) findViewById(R.id.Camera_Veille);
         Signe_vie = (TextView) findViewById(R.id.signedevie);
+        veilleButton = findViewById(R.id.Mise_en_veille);
         client = ClientSingleton.getClient();
         executor = Executors.newSingleThreadScheduledExecutor();
     }
@@ -112,11 +116,11 @@ public class CameraActivity extends AppCompatActivity {
     }
 
     public void onSleepClick(View v) {
-        if (cameraState != null && !cameraState.isSleeping()) {
-            onCommandClick(Command.WAKE_UP);
-        } else {
-            onCommandClick(Command.SLEEP);
+        if (cameraState == null) {
+            Toast.makeText(this, "Attendez la fin du chargement", Toast.LENGTH_SHORT).show();
+            return;
         }
+        onCommandClick(cameraState.isSleeping() ? Command.WAKE_UP : Command.SLEEP);
     }
 
     public void onTurnOffClick(View v) {
@@ -130,8 +134,7 @@ public class CameraActivity extends AppCompatActivity {
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        Toast.makeText(CameraActivity.this, "La commande a bien été envoyée", Toast.LENGTH_SHORT).show();
-                        getCameraState.run();
+                        Snackbar.make(veilleButton, "La commande a bien été envoyée. Attendez 10s pour voir le changement", Snackbar.LENGTH_LONG).show();
                     }
                 });
             }

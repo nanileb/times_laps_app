@@ -79,7 +79,7 @@
     </LinearLayout>
 
 
-    <LinearLayout
+    <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="43dp"
         android:layout_marginTop="220sp"
@@ -89,7 +89,7 @@
             android:id="@+id/Mise_en_veille"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="40sp"
+            android:layout_marginStart="20dp"
             android:text="Mettre en veille"
             android:onClick="onSleepClick"/>
 
@@ -98,12 +98,13 @@
             android:id="@+id/Eteindre"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="40sp"
+            android:layout_alignParentEnd="true"
+            android:layout_marginEnd="20dp"
             android:text="Eteindre"
             android:onClick="onTurnOffClick"
             />
 
-    </LinearLayout>
+    </RelativeLayout>
 
 
 
