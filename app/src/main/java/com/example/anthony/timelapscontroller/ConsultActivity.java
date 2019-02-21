@@ -30,7 +30,7 @@ import java.util.Date;
 
 public class ConsultActivity extends AppCompatActivity {
 
-    private SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy kk:mm");
+    private SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm");
     private TimelapseClient client;
     private Execution execution;
     private Long Calcul = 0L;
@@ -206,7 +206,7 @@ public class ConsultActivity extends AppCompatActivity {
                         date.setHours(hourOfDay);
                         date.setMinutes(minute);
                         execution.setEndTime(date.getTime());
-                        
+
                         textdatefin.setText(sdf.format(date));
 
                         updateCalcul();

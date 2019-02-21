@@ -31,7 +31,7 @@ import java.util.Date;
 
 public class NewExecutionActivity extends AppCompatActivity {
 
-    private SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy kk:mm");
+    private SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm");
     private Execution execution = new Execution(null, 0, 0, 0, 0);
     private TextView textdatedebut;
     private TextView textdatefin;
