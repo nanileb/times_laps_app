@@ -73,7 +73,7 @@ public class NewExecutionActivity extends AppCompatActivity {
                 if (s.toString().isEmpty()) {
                     return;
                 }
-                execution.setFrequency(Long.parseLong(s.toString()));
+                execution.setPeriod(Long.parseLong(s.toString()));
                 updateCalcul();
                 nbphoto.setText(Calcul.toString());
             }
@@ -164,7 +164,7 @@ public class NewExecutionActivity extends AppCompatActivity {
             return;
         }
 
-        execution.setFrequency(Long.parseLong(f));
+        execution.setPeriod(Long.parseLong(f));
 
 
         if (execution.getStartTime()<execution.getEndTime()){
@@ -202,8 +202,8 @@ public class NewExecutionActivity extends AppCompatActivity {
     }
 
     private void updateCalcul() {
-        if (execution.getFrequency() > 0) {
-            Calcul = (execution.getEndTime()-execution.getStartTime())/(1000 *execution.getFrequency());
+        if (execution.getPeriod() > 0) {
+            Calcul = (execution.getEndTime()-execution.getStartTime())/(1000 *execution.getPeriod());
         }
     }
 }

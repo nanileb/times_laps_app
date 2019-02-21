@@ -67,7 +67,7 @@ public class ConsultActivity extends AppCompatActivity {
                 if (s.toString().isEmpty()) {
                     return;
                 }
-                execution.setFrequency(Long.parseLong(s.toString()));
+                execution.setPeriod(Long.parseLong(s.toString()));
                 updateCalcul();
                 nbphoto.setText(Calcul.toString());
             }
@@ -89,7 +89,7 @@ public class ConsultActivity extends AppCompatActivity {
                         edittitre.setText(execution.getTitle());
                         textdatedebut.setText(sdf.format(execution.getStartTime()));
                         textdatefin.setText(sdf.format(execution.getEndTime()));
-                        frequency.setText( String.valueOf(execution.getFrequency()));
+                        frequency.setText( String.valueOf(execution.getPeriod()));
 
 
                     }
@@ -237,7 +237,7 @@ public class ConsultActivity extends AppCompatActivity {
             return;
         }
 
-        execution.setFrequency(Long.parseLong(f));
+        execution.setPeriod(Long.parseLong(f));
 
 
         if (execution.getStartTime()<execution.getEndTime()){
@@ -275,8 +275,8 @@ public class ConsultActivity extends AppCompatActivity {
     }
 
     private void updateCalcul() {
-        if (execution.getFrequency() > 0) {
-            Calcul = (execution.getEndTime()-execution.getStartTime()+4)/(1000 *execution.getFrequency());
+        if (execution.getPeriod() > 0) {
+            Calcul = (execution.getEndTime()-execution.getStartTime()+4)/(1000 *execution.getPeriod());
         }
     }
 }
