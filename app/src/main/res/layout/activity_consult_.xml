@@ -38,8 +38,9 @@
             android:id="@+id/temps_debut"
             android:layout_width="190dp"
             android:layout_height="wrap_content"
-            android:text="Choisir date début" />
-        <!--android:onClick="choisirTemps"-->
+            android:text="Choisir date début"
+            android:onClick="choisirTemps"/>
+
 
 
     <TextView
@@ -59,8 +60,9 @@
         android:id="@+id/heure_debut"
         android:layout_width="190dp"
         android:layout_height="wrap_content"
-        android:text="Choisir date fin" />
-    <!--android:onClick="choisirfin"-->
+        android:text="Choisir date fin"
+        android:onClick="choisirfin"/>
+
 
 
     <TextView
