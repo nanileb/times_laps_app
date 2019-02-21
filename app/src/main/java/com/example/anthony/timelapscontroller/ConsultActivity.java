@@ -29,7 +29,7 @@ import java.util.Date;
 
 public class ConsultActivity extends AppCompatActivity {
 
-    private SimpleDateFormat sdf = new SimpleDateFormat("kk:mm dd/MM/yyyy");
+    private SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy kk:mm");
     private TimelapseClient client;
     private Execution execution;
     private Long Calcul = 0L;
