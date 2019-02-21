@@ -12,7 +12,8 @@
         android:roundIcon="@drawable/time_lapse"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".CameraActivity" />
+        <activity android:name=".CameraActivity"
+            android:label="@string/Etat_Camera"/>
         <activity
             android:name=".MainActivity"
             android:label="@string/app_name"
@@ -23,8 +24,10 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".NewExecutionActivity" />
-        <activity android:name=".ConsultActivity" />
+        <activity android:name=".NewExecutionActivity"
+            android:label="@string/Nouvelle_Execution"/>
+        <activity android:name=".ConsultActivity"
+            android:label="@string/Consultation_Execution"/>
         <activity
             android:name=".PhotoActivity"
             android:label="@string/title_activity_photo"

@@ -2,5 +2,8 @@
     <string name="app_name">TimeLaps Controller</string>
     <string name="action_settings">Settings</string>
     <string name="base_url">http://35.190.129.148:8080/</string>
-    <string name="title_activity_photo">PhotoActivity</string>
+    <string name="title_activity_photo">Photos</string>
+    <string name="Nouvelle_Execution">Nouvelle execution</string>
+    <string name="Consultation_Execution">Consultation execution</string>
+    <string name="Etat_Camera">Etat de la caméra</string>
 </resources>
