@@ -3,6 +3,7 @@ package com.example.anthony.timelapscontroller;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.app4.project.timelapse.api.client.Callback;
@@ -11,6 +12,7 @@ import com.app4.project.timelapse.model.CameraState;
 import com.app4.project.timelapse.model.Command;
 import com.app4.project.timelapse.model.ErrorResponse;
 
+import java.text.SimpleDateFormat;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
@@ -18,10 +20,14 @@ import java.util.concurrent.TimeUnit;
 
 public class CameraActivity extends AppCompatActivity {
 
+    private SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy kk:mm");
     private TimelapseClient client;
     private ScheduledFuture scheduledFuture;
     private ScheduledExecutorService executor;
     private CameraState cameraState;
+    private TextView allume;
+    private TextView veille;
+    private TextView Signe_vie;
     private final Runnable getCameraState = new Runnable() {
         @Override
         public void run() {
@@ -59,6 +65,9 @@ public class CameraActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_camera);
+        allume = (TextView) findViewById(R.id.Camera_On);
+        veille = (TextView) findViewById(R.id.Camera_Veille);
+        Signe_vie = (TextView) findViewById(R.id.signedevie);
         client = ClientSingleton.getClient();
         executor = Executors.newSingleThreadScheduledExecutor();
     }
@@ -80,7 +89,22 @@ public class CameraActivity extends AppCompatActivity {
     }
 
     private void updateCameraView(CameraState cameraState) {
-        //TODO mettre a jour la valeur des Textview qui affiche les données dans Camerastate
+        //TODO mettre a jour la valeur des Textview qui affiche les données dans Camerastate1
+
+        if(cameraState.isTurnedOn()) {
+            allume.setText("oui");
+
+        }else{
+            allume.setText("non");
+        }
+
+        if(cameraState.isSleeping()){
+            veille.setText("oui");
+        }else{
+            veille.setText("non");
+        }
+
+        Signe_vie.setText(sdf.format(cameraState.getLastTimeAlive()));
         // utilise cameraState.isTurnedOn() pour savoir si la camera est allumée
         // utilise cameraState.isSleeping() pour savoir si la camera est en veille
         // utilise cameraState.getLastTimeAlive() pour avoir le dernier signe de vie (un long qu'il faut convertir en string avec un SimpleDateFormat, comme dans la MainActivity)
