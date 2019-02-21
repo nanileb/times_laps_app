@@ -206,6 +206,7 @@ public class ConsultActivity extends AppCompatActivity {
                         date.setHours(hourOfDay);
                         date.setMinutes(minute);
                         execution.setEndTime(date.getTime());
+                        
                         textdatefin.setText(sdf.format(date));
 
                         updateCalcul();
