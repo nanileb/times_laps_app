@@ -1,11 +1,19 @@
 package com.example.anthony.timelapscontroller;
 
+import android.Manifest;
+import android.app.ProgressDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.os.Environment;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
@@ -37,6 +45,8 @@ public class PhotoActivity extends AppCompatActivity {
     private ViewPageAdapter viewPageAdapter;
     private ScheduledExecutorService executor;
     private ScheduledFuture scheduledFuture;
+    private final static int WRITE_PERMISSION_REQUEST = 2;
+
     private final Runnable getImageTask = new Runnable() {
         @Override
         public void run() {
@@ -162,9 +172,44 @@ public class PhotoActivity extends AppCompatActivity {
         return String.format(text, nbImages);
     }
 
-    public void videoActivity(View v) {
-        Intent intent = new Intent(this, VideoActivity.class);
-        intent.putExtra(MainActivity.EXECUTION_ID_KEY, executionId);
-        startActivity(intent);
+    public void saveVideo(View v) {
+        if (true) {
+            writePermissionDialog();
+            return;
+        }
+        ProgressDialog dialog = new ProgressDialog(this);
+        dialog.setTitle("Création du fichier mp4");
+        dialog.setCancelable(false);
+        dialog.setButton(DialogInterface.BUTTON_NEGATIVE, "Annuler", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+
+            }
+        });
+        dialog.show();
     }
+
+    public boolean isExternalStorageWritable() {
+        String state = Environment.getExternalStorageState();
+        if (Environment.MEDIA_MOUNTED.equals(state)) {
+            return true;
+        }
+        return false;
+    }
+
+    private void writePermissionDialog() {
+        Toast.makeText(this, "" + isExternalStorageWritable(), Toast.LENGTH_SHORT).show();
+        new AlertDialog.Builder(this)
+                .setTitle("S'il vous plait, autorisez l'application à avoir accès à votre mémoire")
+                .setNeutralButton("Non", null)
+                .setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+
+                    }
+                })
+                .create()
+                .show();
+    }
+
 }
