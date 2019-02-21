@@ -25,7 +25,6 @@
         </activity>
         <activity android:name=".NewExecutionActivity" />
         <activity android:name=".ConsultActivity" />
-        <activity android:name=".ModifyActivity" />
         <activity
             android:name=".PhotoActivity"
             android:label="@string/title_activity_photo"

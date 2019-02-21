@@ -119,7 +119,7 @@
         android:id="@+id/Confirmer"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="150sp"
+        android:layout_marginLeft="140sp"
         android:layout_marginTop="180sp"
         android:baselineAligned="false"
         android:onClick="confirmation"
