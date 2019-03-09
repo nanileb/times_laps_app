@@ -29,7 +29,7 @@ public class ViewPageAdapter extends PagerAdapter {
     private LayoutInflater layoutInflater;
     private int nbImages;
     private final int executionId;
-    private final ResponseHandler<Bitmap> bitmapResponseHandler = new ResponseHandler<Bitmap>() {
+    public static final ResponseHandler<Bitmap> bitmapResponseHandler = new ResponseHandler<Bitmap>() {
         @Override
         public Bitmap convert(InputStream inputStream) throws IOException {
             return BitmapFactory.decodeStream(new BufferedInputStream(inputStream));
