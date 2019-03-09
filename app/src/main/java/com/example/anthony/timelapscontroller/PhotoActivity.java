@@ -23,32 +23,17 @@ import android.support.v4.view.ViewPager;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.NumberPicker;
-import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.app4.project.timelapse.api.client.Callback;
-import com.app4.project.timelapse.api.client.TimelapseBasicClient;
 import com.app4.project.timelapse.api.client.TimelapseClient;
-import com.app4.project.timelapse.api.client.TimelapseResponse;
 import com.app4.project.timelapse.model.ErrorResponse;
 import com.example.anthony.timelapscontroller.service.SaveVideoService;
 
-import org.jcodec.api.SequenceEncoder;
-import org.jcodec.api.android.AndroidSequenceEncoder;
-import org.jcodec.common.Codec;
-import org.jcodec.common.Format;
-import org.jcodec.common.io.NIOUtils;
-import org.jcodec.common.io.SeekableByteChannel;
-import org.jcodec.common.model.Rational;
-import org.jcodec.scale.BitmapUtil;
-
-import java.io.File;
-import java.io.IOException;
 import java.util.Locale;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
