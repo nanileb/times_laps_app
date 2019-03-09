@@ -208,9 +208,9 @@ public class PhotoActivity extends AppCompatActivity {
         numberPicker.setMaxValue(100);
         numberPicker.setValue(24);
 
-        new AlertDialog.Builder(this)
+        final AlertDialog dialog = new AlertDialog.Builder(this)
                 .setTitle("Choisissez le fps")
-                .setMessage("nombre d'images par seconde")
+                .setMessage("Nombre d'images par seconde")
                 .setView(numberPicker)
                 .setNeutralButton("Annuler", null)
                 .setPositiveButton("Sauvegarder", new DialogInterface.OnClickListener() {
@@ -218,8 +218,21 @@ public class PhotoActivity extends AppCompatActivity {
                     public void onClick(DialogInterface dialog, int which) {
                         startSaving(numberPicker.getValue());
                     }
-                })
-                .show();
+                }).create();
+
+        numberPicker.setOnValueChangedListener(new NumberPicker.OnValueChangeListener() {
+            @Override
+            public void onValueChange(NumberPicker picker, int oldVal, int newFps) {
+                long nbImages = viewPageAdapter.getCount();
+                long length = nbImages / newFps;
+                long hours = TimeUnit.SECONDS.toHours(length);
+                long minutes = TimeUnit.SECONDS.toMinutes(length - TimeUnit.HOURS.toSeconds(hours));
+                long seconds = length - (TimeUnit.HOURS.toSeconds(hours) + TimeUnit.MINUTES.toSeconds(minutes));
+                dialog.setMessage(String.format(Locale.FRANCE, "La video durera %dh%dm%ds", hours, minutes, seconds));
+            }
+        });
+
+        dialog.show();
 
     }
 
