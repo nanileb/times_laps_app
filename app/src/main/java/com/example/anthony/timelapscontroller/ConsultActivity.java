@@ -117,6 +117,7 @@ public class ConsultActivity extends AppCompatActivity {
                 //Create the intent to start another activity
                 Intent intent = new Intent(view.getContext(), PhotoActivity.class);
                 intent.putExtra(MainActivity.EXECUTION_ID_KEY, executionId);
+                intent.putExtra(PhotoActivity.EXECUTION_NAME_KEY, edittitre.getText().toString());
                 startActivity(intent);
             }
         });

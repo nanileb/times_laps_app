@@ -2,6 +2,9 @@ package com.example.anthony.timelapscontroller;
 
 import android.Manifest;
 import android.app.ProgressDialog;
+import android.app.job.JobInfo;
+import android.app.job.JobScheduler;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -10,6 +13,7 @@ import android.graphics.Bitmap;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.PersistableBundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
@@ -32,6 +36,7 @@ import com.app4.project.timelapse.api.client.TimelapseBasicClient;
 import com.app4.project.timelapse.api.client.TimelapseClient;
 import com.app4.project.timelapse.api.client.TimelapseResponse;
 import com.app4.project.timelapse.model.ErrorResponse;
+import com.example.anthony.timelapscontroller.service.SaveVideoService;
 
 import org.jcodec.api.SequenceEncoder;
 import org.jcodec.api.android.AndroidSequenceEncoder;
@@ -234,8 +239,22 @@ public class PhotoActivity extends AppCompatActivity {
     }
 
     private void startSaving(int fps) {
-        new VideoSavingTask(getApplicationContext(), viewPageAdapter.getCount(), fileName)
-                .execute(executionId, fps);
+        JobScheduler jobScheduler =
+                (JobScheduler) getSystemService(Context.JOB_SCHEDULER_SERVICE);
+
+        PersistableBundle bundle = new PersistableBundle();
+
+        bundle.putInt("id", 8);
+        bundle.putInt("imagesCount",viewPageAdapter.getCount());
+        bundle.putInt("fps", fps);
+        bundle.putInt("executionId", executionId);
+        bundle.putString("fileName", fileName);
+
+        JobInfo.Builder jobInfoBuilder = new JobInfo.Builder(1,
+                new ComponentName(this, SaveVideoService.class))
+                .setRequiredNetworkType(JobInfo.NETWORK_TYPE_ANY)
+                .setExtras(bundle);
+        jobScheduler.schedule(jobInfoBuilder.build());
     }
 
     private boolean hasWritePermission() {
@@ -278,80 +297,5 @@ public class PhotoActivity extends AppCompatActivity {
         }
     }
 
-    private static class VideoSavingTask extends AsyncTask<Integer,Integer,Exception> {
 
-        private ProgressDialog dialog;
-        private int imagesCount;
-        private String fileName;
-
-        public VideoSavingTask(Context context, int imagesCount, String fileName) {
-            this.dialog = new ProgressDialog(context);
-            this.fileName = fileName;
-            this.imagesCount = imagesCount;
-        }
-
-        @Override
-        protected void onPreExecute() {
-            dialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
-            dialog.setTitle("Création du fichier mp4");
-            dialog.setCancelable(false);
-            dialog.setMax(imagesCount);
-            dialog.setButton(DialogInterface.BUTTON_NEUTRAL, "Annuler", new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-                    cancel(true);
-                }
-            });
-            //dialog.show();
-        }
-
-        @Override
-        protected Exception doInBackground(Integer... args) {
-            int executionId = args[0];
-            int fps = args[1];
-            TimelapseBasicClient client = new TimelapseBasicClient(ClientSingleton.API_URL);
-
-            File file = new File(Environment.getExternalStoragePublicDirectory(
-                    Environment.DIRECTORY_DOWNLOADS), fileName);
-            try {
-                //SequenceEncoder sequenceEncoder = new SequenceEncoder(NIOUtils.writableChannel(file), Rational.R(fps, 1), Format.MPEG_PS, Codec.MPEG4, null);
-                AndroidSequenceEncoder sequenceEncoder = AndroidSequenceEncoder.createSequenceEncoder(file, fps);
-
-                for (int i = 0; i < imagesCount; i++) {
-                    TimelapseResponse<Bitmap> response = client.getImage(ViewPageAdapter.bitmapResponseHandler, executionId, i);
-                    if (!response.isSuccessful()) {
-                        //TODO
-                        continue;
-                    }
-                    //sequenceEncoder.encodeNativeFrame(BitmapUtil.fromBitmap(response.getData()));
-                    sequenceEncoder.encodeImage(response.getData());
-                    publishProgress(i + 1);
-                }
-                sequenceEncoder.finish();
-            } catch (IOException e) {
-                return e;
-            }
-            return null;
-        }
-
-        @Override
-        protected void onProgressUpdate(Integer... values) {
-            int value = values[0];
-            dialog.setProgress(value);
-        }
-
-        @Override
-        protected void onPostExecute(Exception e) {
-            if (e != null) {
-                dialog.setTitle("Une erreur est survenue");
-                dialog.setMessage(e.getMessage());
-                Log.e("ERROR", "Error", e);
-            } else {
-                dialog.setTitle("Sauvegarde terminéee");
-            }
-            dialog.setCancelable(true);
-            dialog.setButton(ProgressDialog.BUTTON_NEUTRAL, "ok", (DialogInterface.OnClickListener) null);
-            dialog = null;
-        }
-    }
 }
