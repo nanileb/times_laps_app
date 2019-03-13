@@ -268,14 +268,14 @@ public class PhotoActivity extends TimelapseActivity {
 
 
     public void goToImage(View v) {
-        if (viewPageAdapter.getCount() == 0) {
+        if (viewPageAdapter == null || viewPageAdapter.getCount() == 0) {
             Toast.makeText(this, "Il n'y a pas d'images", Toast.LENGTH_SHORT).show();
             return;
         }
         final NumberPicker numberPicker = new NumberPicker(this);
         numberPicker.setMinValue(1);
         numberPicker.setMaxValue(viewPageAdapter.getCount());
-        numberPicker.setValue(1);
+        numberPicker.setValue(numberPicker.getMaxValue());
 
         new AlertDialog.Builder(this)
                 .setTitle("Aller à l'image")

@@ -15,13 +15,13 @@ public abstract class TimelapseActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         client = ClientSingleton.getClient();
+        executor = initializeExecutor();
         executor.execute(new Runnable() {
             @Override
             public void run() {
                 //TODO authenticate
             }
         });
-        executor = initializeExecutor();
     }
 
 
