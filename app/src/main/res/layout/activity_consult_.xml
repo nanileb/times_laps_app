@@ -74,49 +74,48 @@
 </LinearLayout>
 
 
-<LinearLayout
-    android:layout_width="match_parent"
-    android:layout_height="43dp"
-    android:orientation="horizontal">
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="58dp"
+        android:layout_marginBottom="10dp"
+        android:orientation="horizontal">
 
-    <TextView
-        android:layout_width="141dp"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="30dp"
-        android:textAlignment="center"
-        android:text="Fréquence (s)" />
+        <TextView
+            android:layout_width="141dp"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="30dp"
+            android:text="Période\n(en secondes)"
+            android:textAlignment="center" />
 
-    <EditText
-        android:id="@+id/frequencereelle"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="20dp"
-        android:inputType="number"/>
+        <EditText
+            android:id="@+id/frequencereelle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="20dp"
+            android:inputType="number" />
 
-</LinearLayout>
+    </LinearLayout>
 
-<LinearLayout
-    android:layout_width="match_parent"
-    android:layout_height="43dp"
-    android:orientation="horizontal">
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="43dp"
+        android:orientation="horizontal">
 
-    <TextView
-        android:layout_width="140dp"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="30dp"
-        android:text="Nombre de photos : "
-        android:textAlignment="center"
-        />
+        <TextView
+            android:layout_width="140dp"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="30dp"
+            android:text="Nombre de photos : "
+            android:textAlignment="center" />
 
-    <TextView
-        android:id="@+id/photoreel"
-        android:layout_width="wrap_content"
-        android:inputType="number"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="20dp"
-        android:text="Nombre"
-        />
-</LinearLayout>
+        <TextView
+            android:id="@+id/photoreel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="20dp"
+            android:inputType="number"
+            android:text="Nombre" />
+    </LinearLayout>
 
 
 <RelativeLayout

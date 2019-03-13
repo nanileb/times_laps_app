@@ -81,7 +81,7 @@
             android:layout_height="60dp"
             android:layout_marginLeft="30dp"
             android:textAlignment="center"
-            android:text="Fréquence\n(en secondes)" />
+            android:text="Période\n(en secondes)" />
 
         <EditText
             android:id="@+id/editfrequency"
@@ -94,7 +94,7 @@
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="43dp"
+        android:layout_height="wrap_content"
         android:orientation="horizontal">
 
         <TextView

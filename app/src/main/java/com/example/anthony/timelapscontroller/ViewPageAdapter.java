@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.os.Build;
 import android.support.annotation.NonNull;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
@@ -29,6 +30,8 @@ public class ViewPageAdapter extends PagerAdapter {
     private LayoutInflater layoutInflater;
     private int nbImages;
     private final int executionId;
+
+
     public static final ResponseHandler<Bitmap> bitmapResponseHandler = new ResponseHandler<Bitmap>() {
         @Override
         public Bitmap convert(InputStream inputStream) throws IOException {
@@ -63,6 +66,7 @@ public class ViewPageAdapter extends PagerAdapter {
     @Override
     public Object instantiateItem(@NonNull ViewGroup container, int position) {
 
+
         layoutInflater = (LayoutInflater) activity.getSystemService(Activity.LAYOUT_INFLATER_SERVICE);
         View view = layoutInflater.inflate(R.layout.custom_layout, null);
         final ImageView imageView = (ImageView) view.findViewById(R.id.imageView);
@@ -96,6 +100,10 @@ public class ViewPageAdapter extends PagerAdapter {
 
         ViewPager Vp2 = (ViewPager) container;
         Vp2.addView(view, 0);
+
+
+
+
         return view;
 
 
