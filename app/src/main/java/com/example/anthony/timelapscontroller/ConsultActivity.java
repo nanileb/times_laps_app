@@ -20,18 +20,20 @@ import android.widget.TimePicker;
 import android.widget.Toast;
 
 import com.app4.project.timelapse.api.client.Callback;
+import com.app4.project.timelapse.api.client.TimelapseBasicClient;
 import com.app4.project.timelapse.api.client.TimelapseClient;
+import com.app4.project.timelapse.api.client.TimelapseResponse;
 import com.app4.project.timelapse.model.ErrorResponse;
 import com.app4.project.timelapse.model.Execution;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.concurrent.Executor;
 
 
-public class ConsultActivity extends AppCompatActivity {
+public class ConsultActivity extends TimelapseActivity {
 
     private SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm");
-    private TimelapseClient client;
     private Execution execution;
     private Long Calcul = 0L;
     private TextView nbphoto;
@@ -46,15 +48,11 @@ public class ConsultActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_consult_);
 
-
         nbphoto=findViewById(R.id.photoreel);
         textdatedebut=findViewById(R.id.heuredebutreelle);
         textdatefin = findViewById(R.id.heurefinreelle);
         frequency = findViewById(R.id.frequencereelle);
         edittitre = findViewById(R.id.Nomdexe);
-
-
-        client = ClientSingleton.getClient();
 
         frequency.addTextChangedListener(new TextWatcher() {
             @Override
@@ -79,34 +77,32 @@ public class ConsultActivity extends AppCompatActivity {
         });
 
         executionId = getIntent().getIntExtra(MainActivity.EXECUTION_ID_KEY, 0);
-        client.getExecution(executionId, new Callback<Execution>() {
+
+        getExecutor().execute(new Runnable() {
             @Override
-            public void onSuccess(int i, final Execution execution) {
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        ConsultActivity.this.execution = execution;
-                        edittitre.setText(execution.getTitle());
-                        textdatedebut.setText(sdf.format(execution.getStartTime()));
-                        textdatefin.setText(sdf.format(execution.getEndTime()));
-                        frequency.setText( String.valueOf(execution.getPeriod()));
-
-
-                    }
-                });
-            }
-
-            @Override
-            public void onError(int i, final ErrorResponse errorResponse) {
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        Toast.makeText(ConsultActivity.this, "Erreur lors du chargement de l'execution: " + errorResponse.getMessage(), Toast.LENGTH_SHORT).show();
-                    }
-                });
+            public void run() {
+                final TimelapseResponse<Execution> response = getClient().getExecution(executionId);
+                if (response.isSuccessful()) {
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            ConsultActivity.this.execution = response.getData();
+                            edittitre.setText(execution.getTitle());
+                            textdatedebut.setText(sdf.format(execution.getStartTime()));
+                            textdatefin.setText(sdf.format(execution.getEndTime()));
+                            frequency.setText( String.valueOf(execution.getPeriod()));
+                        }
+                    });
+                } else {
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            Toast.makeText(ConsultActivity.this, "Erreur lors du chargement de l'execution: " + response.getError().getMessage(), Toast.LENGTH_SHORT).show();
+                        }
+                    });
+                }
             }
         });
-
 
         Button Photos = (Button) findViewById(R.id.PhotosVisua);
 
@@ -129,30 +125,30 @@ public class ConsultActivity extends AppCompatActivity {
             //On click function
             public void onClick(View view) {
                 //Create the intent to start another activity
-                client.deleteExecution(executionId, new Callback<Boolean>() {
+                getExecutor().execute(new Runnable() {
                     @Override
-                    public void onSuccess(int i, final Boolean success) {
-                        runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                if (success) {
-                                    Toast.makeText(getApplicationContext(), "L'execution a bien ete supprimée", Toast.LENGTH_SHORT).show();
-                                    finish();
-                                } else {
-                                    Toast.makeText(ConsultActivity.this, "L'execution n'a pas pu être suprimée", Toast.LENGTH_SHORT).show();
+                    public void run() {
+                        final TimelapseResponse<Boolean> response = getClient().deleteExecution(executionId);
+                        if (response.isSuccessful()) {
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    if (response.getData()) {
+                                        Toast.makeText(getApplicationContext(), "L'execution a bien ete supprimée", Toast.LENGTH_SHORT).show();
+                                        finish();
+                                    } else {
+                                        Toast.makeText(ConsultActivity.this, "L'execution n'a pas pu être suprimée", Toast.LENGTH_SHORT).show();
+                                    }
                                 }
-                            }
-                        });
-                    }
-
-                    @Override
-                    public void onError(int i, final ErrorResponse errorResponse) {
-                        runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                Toast.makeText(ConsultActivity.this, "Une erreur est survenue: " + errorResponse.getTitle(), Toast.LENGTH_SHORT).show();
-                            }
-                        });
+                            });
+                        } else {
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    Toast.makeText(ConsultActivity.this, "Une erreur est survenue: " + response.getError().getTitle(), Toast.LENGTH_SHORT).show();
+                                }
+                            });
+                        }
                     }
                 });
             }
@@ -242,28 +238,27 @@ public class ConsultActivity extends AppCompatActivity {
 
 
         if (execution.getStartTime()<execution.getEndTime()){
-            client.putExecution(executionId, execution, new Callback<Execution>() {
+            getExecutor().execute(new Runnable() {
                 @Override
-                public void onSuccess(int i, Execution execution) {
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            Toast.makeText(getApplicationContext(), "Success", Toast.LENGTH_SHORT).show();
-                            finish();
-                        }
-                    });
+                public void run() {
+                    final TimelapseResponse<Execution> response = getClient().putExecution(executionId, execution);
+                    if (response.isSuccessful()) {
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                Toast.makeText(getApplicationContext(), "Success", Toast.LENGTH_SHORT).show();
+                                finish();
+                            }
+                        });
+                    } else {
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                Snackbar.make(textdatedebut, "Une erreur est survenue: " + response.getData().getTitle(), Snackbar.LENGTH_LONG).show();
+                            }
+                        });
+                    }
                 }
-
-                @Override
-                public void onError(int i, final ErrorResponse errorResponse) {
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            Snackbar.make(textdatedebut, "Une erreur est survenue: " + errorResponse.getTitle(), Snackbar.LENGTH_LONG).show();
-                        }
-                    });
-                }
-
             });
         }
         else{

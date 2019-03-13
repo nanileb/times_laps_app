@@ -20,7 +20,9 @@ import android.widget.Toast;
 
 import com.app4.project.timelapse.api.client.Callback;
 import com.app4.project.timelapse.api.client.TimelapseAsyncClient;
+import com.app4.project.timelapse.api.client.TimelapseBasicClient;
 import com.app4.project.timelapse.api.client.TimelapseClient;
+import com.app4.project.timelapse.api.client.TimelapseResponse;
 import com.app4.project.timelapse.model.ErrorResponse;
 import com.app4.project.timelapse.model.Execution;
 
@@ -28,14 +30,14 @@ import java.sql.Time;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.concurrent.Executor;
 
-public class NewExecutionActivity extends AppCompatActivity {
+public class NewExecutionActivity extends TimelapseActivity {
 
     private SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm");
     private Execution execution = new Execution(null, 0, 0, 0, 0);
     private TextView textdatedebut;
     private TextView textdatefin;
-    private TimelapseClient client;
     private EditText edittitre;
     private EditText frequency;
     private Long Calcul = 0L;
@@ -51,7 +53,6 @@ public class NewExecutionActivity extends AppCompatActivity {
         setContentView(R.layout.activity_new_execution);
         textdatedebut=findViewById(R.id.datedebuttext);
         textdatefin = findViewById(R.id.datefintext);
-        client  = ClientSingleton.getClient();
         edittitre=findViewById(R.id.edittitle);
         frequency=findViewById(R.id.editfrequency);
         nbphoto=findViewById(R.id.nombrephoto);
@@ -168,29 +169,28 @@ public class NewExecutionActivity extends AppCompatActivity {
 
 
         if (execution.getStartTime()<execution.getEndTime()){
-        client.postExecution(execution, new Callback<Execution>() {
-            @Override
-            public void onSuccess(int i, Execution execution) {
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        Toast.makeText(getApplicationContext(), "Success", Toast.LENGTH_SHORT).show();
-                        finish();
+            getExecutor().execute(new Runnable() {
+                @Override
+                public void run() {
+                    final TimelapseResponse<Execution> response = getClient().postExecution(execution);
+                    if (response.isSuccessful()) {
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                Toast.makeText(getApplicationContext(), "Success", Toast.LENGTH_SHORT).show();
+                                finish();
+                            }
+                        });
+                    } else {
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                Snackbar.make(textdatedebut, "Une erreur est survenue: " + response.getError().getTitle(), Snackbar.LENGTH_LONG).show();
+                            }
+                        });
                     }
-                });
-            }
-
-            @Override
-            public void onError(int i, final ErrorResponse errorResponse) {
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        Snackbar.make(textdatedebut, "Une erreur est survenue: " + errorResponse.getTitle(), Snackbar.LENGTH_LONG).show();
-                    }
-                });
-            }
-
-        });
+                }
+            });
         }
         else{
             Toast.makeText(NewExecutionActivity.this,"La date de début est supérieur à la date de fin !!", Toast.LENGTH_SHORT).show();

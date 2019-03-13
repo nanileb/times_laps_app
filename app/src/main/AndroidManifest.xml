@@ -12,6 +12,15 @@
         android:roundIcon="@drawable/time_lapse"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
+        <provider
+            android:name=".file.provider.GenericFileProvider"
+            android:authorities="${applicationId}.my.package.name.provider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/provider_paths"/>
+        </provider>
         <activity android:name=".CameraActivity"
             android:label="@string/Etat_Camera"/>
         <activity

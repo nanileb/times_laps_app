@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android" android:layout_width="match_parent"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="?android:attr/selectableItemBackground"
-    android:clickable="true"
-    android:layout_marginBottom="8dp"
+    android:foreground="?android:attr/selectableItemBackground"
     android:orientation="vertical"
     >
     <TextView
+        android:paddingStart="8dp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textSize="18sp"
@@ -15,13 +15,14 @@
         android:id="@+id/title"
         />
     <TextView
-
+        android:paddingStart="8dp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/datecommencement"
         />
 
     <TextView
+        android:paddingStart="8dp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/datefin"
@@ -29,5 +30,6 @@
     <View
         android:layout_width="match_parent"
         android:layout_height="1dp"
+        android:layout_marginTop="8dp"
         android:background="#a3a0a0"/>
 </LinearLayout>

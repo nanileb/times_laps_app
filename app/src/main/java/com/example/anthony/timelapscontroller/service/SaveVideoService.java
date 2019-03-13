@@ -19,6 +19,7 @@ import android.os.Build;
 import android.os.Environment;
 import android.os.PersistableBundle;
 import android.support.v4.app.NotificationCompat;
+import android.support.v4.content.FileProvider;
 import android.util.Log;
 
 import com.app4.project.timelapse.api.client.TimelapseBasicClient;
@@ -187,6 +188,20 @@ public class SaveVideoService extends JobService {
         }
 
         @Override
+        protected void onCancelled() {
+            notifBuilder.mActions.clear();
+            notifBuilder
+                    .setAutoCancel(true)
+                    .setOngoing(false)
+                    .setProgress(0,0, false)
+                    .setContentTitle("Sauvegarde annulée")
+                    .setContentText("");
+            notificationManager.notify(notifId, notifBuilder.build());
+            endRunnable.run();
+            dispose();
+        }
+
+        @Override
         protected void onPostExecute(Exception e) {
             notifBuilder.mActions.clear();
             notifBuilder
@@ -195,8 +210,11 @@ public class SaveVideoService extends JobService {
                     .setProgress(0,0, false);
 
             if (e == null) {
-                Uri path = Uri.fromFile(file);
+                Uri path = FileProvider.getUriForFile(notifBuilder.mContext,
+                        notifBuilder.mContext.getApplicationContext().getPackageName() + "my.package.name.provider",
+                        file);
                 Intent intent = new Intent(Intent.ACTION_VIEW);
+                intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
                 intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 Intent chooser = Intent.createChooser(intent, "Ouvrir la video avec...");
                 intent.setDataAndType(path, "video/*");

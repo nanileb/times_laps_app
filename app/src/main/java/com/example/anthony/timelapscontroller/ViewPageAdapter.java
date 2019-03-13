@@ -1,10 +1,8 @@
 package com.example.anthony.timelapscontroller;
 
 import android.app.Activity;
-import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.os.Build;
 import android.support.annotation.NonNull;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
@@ -15,17 +13,20 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 
 import com.app4.project.timelapse.api.client.Callback;
-import com.app4.project.timelapse.api.client.TimelapseClient;
+import com.app4.project.timelapse.api.client.TimelapseBasicClient;
+import com.app4.project.timelapse.api.client.TimelapseResponse;
 import com.app4.project.timelapse.model.ErrorResponse;
 import com.tambapps.http.restclient.request.handler.response.ResponseHandler;
 
 import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.concurrent.Executor;
 
 public class ViewPageAdapter extends PagerAdapter {
 
-    private final TimelapseClient client = ClientSingleton.getClient();
+    private final TimelapseBasicClient client;
+    private final Executor executor;
     private Activity activity;
     private LayoutInflater layoutInflater;
     private int nbImages;
@@ -39,7 +40,9 @@ public class ViewPageAdapter extends PagerAdapter {
         }
     };
 
-    public ViewPageAdapter(Activity activity, int executionId, int nbImages) {
+    public ViewPageAdapter(TimelapseBasicClient client, Executor executor, Activity activity, int executionId, int nbImages) {
+        this.client = client;
+        this.executor = executor;
         this.activity = activity;
         this.nbImages = nbImages;
         this.executionId = executionId;
@@ -64,7 +67,7 @@ public class ViewPageAdapter extends PagerAdapter {
 
     @NonNull
     @Override
-    public Object instantiateItem(@NonNull ViewGroup container, int position) {
+    public Object instantiateItem(@NonNull ViewGroup container, final int position) {
 
 
         layoutInflater = (LayoutInflater) activity.getSystemService(Activity.LAYOUT_INFLATER_SERVICE);
@@ -73,30 +76,29 @@ public class ViewPageAdapter extends PagerAdapter {
         final ProgressBar progressBar = (ProgressBar) view.findViewById(R.id.imageProgressBar);
         progressBar.setVisibility(View.VISIBLE);
         //TODO (pour Nelson) les images sont coupees
-
-        client.getImage(bitmapResponseHandler, new Callback<Bitmap>() {
+        executor.execute(new Runnable() {
             @Override
-            public void onSuccess(int responseCode, final Bitmap bitmap) {
-                activity.runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        imageView.setImageBitmap(bitmap);
-                        progressBar.setVisibility(View.INVISIBLE);
-                    }
-                });
+            public void run() {
+                final TimelapseResponse<Bitmap> response = client.getImage(bitmapResponseHandler, executionId, position);
+                if (response.isSuccessful()) {
+                    activity.runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            imageView.setImageBitmap(response.getData());
+                            progressBar.setVisibility(View.INVISIBLE);
+                        }
+                    });
+                } else {
+                    activity.runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            imageView.setImageResource(R.drawable.error);
+                            progressBar.setVisibility(View.INVISIBLE);
+                        }
+                    });
+                }
             }
-
-            @Override
-            public void onError(int responseCode, ErrorResponse errorResponse) {
-                activity.runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        imageView.setImageResource(R.drawable.error);
-                        progressBar.setVisibility(View.INVISIBLE);
-                    }
-                });
-            }
-        }, executionId, position);
+        });
 
         ViewPager Vp2 = (ViewPager) container;
         Vp2.addView(view, 0);

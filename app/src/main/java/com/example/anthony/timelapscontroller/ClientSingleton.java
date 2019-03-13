@@ -1,17 +1,25 @@
 package com.example.anthony.timelapscontroller;
 
-import com.app4.project.timelapse.api.client.TimelapseAsyncClient;
+import com.app4.project.timelapse.api.client.TimelapseBasicClient;
 import com.app4.project.timelapse.api.client.TimelapseClient;
-import com.app4.project.timelapse.api.client.TimelapseFakeClient;
+import com.app4.project.timelapse.model.User;
+
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
 
 public class ClientSingleton {
     public static final String API_URL = "https://timelapse-server.herokuapp.com/";
-    private static TimelapseClient client;
+    public static final User USER = new User("android", "fdshsdfmhlhdfs");
+    private static TimelapseBasicClient client;
 
-    public static TimelapseClient getClient() {
+    public static TimelapseBasicClient getClient() {
         if (client == null) {
-            client = new TimelapseAsyncClient(API_URL);
+            client = new TimelapseBasicClient(API_URL);
         }
         return client;
+    }
+
+    public static Executor getExecutor() {
+        return Executors.newSingleThreadExecutor();
     }
 }

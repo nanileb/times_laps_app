@@ -1,7 +1,6 @@
 package com.example.anthony.timelapscontroller;
 
 import android.Manifest;
-import android.app.ProgressDialog;
 import android.app.job.JobInfo;
 import android.app.job.JobScheduler;
 import android.content.ComponentName;
@@ -9,12 +8,8 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.graphics.Bitmap;
-import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.Environment;
 import android.os.PersistableBundle;
-import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
@@ -30,11 +25,12 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.app4.project.timelapse.api.client.Callback;
-import com.app4.project.timelapse.api.client.TimelapseClient;
+import com.app4.project.timelapse.api.client.TimelapseResponse;
 import com.app4.project.timelapse.model.ErrorResponse;
 import com.example.anthony.timelapscontroller.service.SaveVideoService;
 
 import java.util.Locale;
+import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
@@ -44,48 +40,44 @@ import java.util.concurrent.TimeUnit;
  * Une requete au serveur est faite toutes les 10 secondes pour voir si de nouvelles
  * images ont été prises
  */
-public class PhotoActivity extends AppCompatActivity {
+public class PhotoActivity extends TimelapseActivity {
 
     public static final String EXECUTION_NAME_KEY = "EXNAMESTRINGKEY";
-    private TimelapseClient client;
     ViewPager viewpager;
     TextView textView;
     private int executionId;
     private String fileName;
     private Button videoButton;
     private ViewPageAdapter viewPageAdapter;
-    private ScheduledExecutorService executor;
     private ScheduledFuture scheduledFuture;
     private final static int WRITE_PERMISSION_REQUEST = 2;
 
     private final Runnable getImageTask = new Runnable() {
         @Override
         public void run() {
-            client.getImagesCount(executionId, new Callback<Integer>() {
-                @Override
-                public void onSuccess(int responseCode, final Integer nbImages) {
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            textView.setText(nbImagesText(nbImages));
-                            viewPageAdapter.updateCount(nbImages);
-                            videoButton.setVisibility(nbImages > 1 ? View.VISIBLE : View.GONE);
-                        }
-                    });
-                }
+            final TimelapseResponse<Integer> response = getClient().getImagesCount(executionId);
+            if (response.isSuccessful()) {
+                final int nbImages = response.getData();
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        textView.setText(nbImagesText(nbImages));
+                        viewPageAdapter.updateCount(nbImages);
+                        videoButton.setVisibility(nbImages > 1 ? View.VISIBLE : View.GONE);
+                        final TextView imageIndexText = (TextView) findViewById(R.id.imageIndexText);
+                        imageIndexText.setText(String.format(Locale.getDefault(), "image %d sur %d", viewpager.getCurrentItem() + 1, nbImages));
 
-                @Override
-                public void onError(int responseCode, final ErrorResponse errorResponse) {
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            Snackbar.make(viewpager, "Une erreur est survenue:" + errorResponse.getMessage(),
-                                    Snackbar.LENGTH_SHORT).show();
-                        }
-                    });
-
-                }
-            });
+                    }
+                });
+            } else {
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        Snackbar.make(viewpager, "Une erreur est survenue:" + response.getError().getMessage(),
+                                Snackbar.LENGTH_SHORT).show();
+                    }
+                });
+            }
         }
     };
 
@@ -96,9 +88,6 @@ public class PhotoActivity extends AppCompatActivity {
         setContentView(R.layout.activity_photo);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-
-        executor = Executors.newSingleThreadScheduledExecutor();
-        client = ClientSingleton.getClient();
 
         viewpager = (ViewPager) findViewById(R.id.VP);
         videoButton = findViewById(R.id.voir_video);
@@ -133,37 +122,33 @@ public class PhotoActivity extends AppCompatActivity {
             executionName = "";
         }
         fileName = createName(executionName) + ".mp4";
-        client.getImagesCount(executionId, new Callback<Integer>() {
+        getExecutor().execute(new Runnable() {
             @Override
-            public void onSuccess(int responseCode, final Integer nbImages) {
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        viewPageAdapter = new ViewPageAdapter(PhotoActivity.this, executionId, nbImages);
-                        imageIndexText.setText(nbImages == 0 ? "Pas d'images" :
-                                String.format(Locale.getDefault(), "image %d sur %d", 1, nbImages));
+            public void run() {
+                final TimelapseResponse<Integer> response = getClient().getImagesCount(executionId);
+                if (response.isSuccessful()) {
+                    final int nbImages = response.getData();
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            viewPageAdapter = new ViewPageAdapter(getClient(), getExecutor(), PhotoActivity.this, executionId, nbImages);
+                            imageIndexText.setText(nbImages == 0 ? "Pas d'images" :
+                                    String.format(Locale.getDefault(), "image %d sur %d", 1, nbImages));
 
-                        viewpager.setAdapter(viewPageAdapter);
-                        textView.setText(nbImagesText(nbImages));
-                        videoButton.setVisibility(nbImages > 1 ? View.VISIBLE : View.GONE);
-                    }
-                });
-            }
-
-            @Override
-            public void onError(int responseCode, final ErrorResponse errorResponse) {
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                Snackbar.make(viewpager, "Une erreur est survenue lors du chargement des images:" + errorResponse.getMessage(),
-                                        Snackbar.LENGTH_SHORT).show();
-                            }
-                        });
-                    }
-                });
+                            viewpager.setAdapter(viewPageAdapter);
+                            textView.setText(nbImagesText(nbImages));
+                            videoButton.setVisibility(nbImages > 1 ? View.VISIBLE : View.GONE);
+                        }
+                    });
+                } else {
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            Snackbar.make(viewpager, "Une erreur est survenue lors du chargement des images:" + response.getError().getMessage(),
+                                    Snackbar.LENGTH_SHORT).show();
+                        }
+                    });
+                }
             }
         });
     }
@@ -180,7 +165,7 @@ public class PhotoActivity extends AppCompatActivity {
     protected void onStart() {
         super.onStart();
         long period = 4;
-        scheduledFuture = executor.scheduleAtFixedRate(getImageTask, period, period, TimeUnit.SECONDS);
+        scheduledFuture = ((ScheduledExecutorService)getExecutor()).scheduleAtFixedRate(getImageTask, period, period, TimeUnit.SECONDS);
     }
 
     @Override
@@ -282,7 +267,29 @@ public class PhotoActivity extends AppCompatActivity {
     }
 
 
+    public void goToImage(View v) {
+        if (viewPageAdapter.getCount() == 0) {
+            Toast.makeText(this, "Il n'y a pas d'images", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        final NumberPicker numberPicker = new NumberPicker(this);
+        numberPicker.setMinValue(1);
+        numberPicker.setMaxValue(viewPageAdapter.getCount());
+        numberPicker.setValue(1);
+
+        new AlertDialog.Builder(this)
+                .setTitle("Aller à l'image")
+                .setView(numberPicker)
+                .setNeutralButton("Annuler", null)
+                .setPositiveButton("Go", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        viewpager.setCurrentItem(numberPicker.getValue() - 1, true);
+                    }
+                }).show();
+    }
     @Override
+
     public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
         if (requestCode == WRITE_PERMISSION_REQUEST) {
             if (grantResults.length > 0) {
@@ -295,5 +302,8 @@ public class PhotoActivity extends AppCompatActivity {
         }
     }
 
-
+    @Override
+    Executor initializeExecutor() {
+        return Executors.newSingleThreadScheduledExecutor();
+    }
 }

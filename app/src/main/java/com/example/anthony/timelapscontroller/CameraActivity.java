@@ -9,23 +9,24 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.app4.project.timelapse.api.client.Callback;
+import com.app4.project.timelapse.api.client.TimelapseBasicClient;
 import com.app4.project.timelapse.api.client.TimelapseClient;
+import com.app4.project.timelapse.api.client.TimelapseResponse;
 import com.app4.project.timelapse.model.CameraState;
 import com.app4.project.timelapse.model.Command;
 import com.app4.project.timelapse.model.ErrorResponse;
 
 import java.text.SimpleDateFormat;
+import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
-public class CameraActivity extends AppCompatActivity {
+public class CameraActivity extends TimelapseActivity {
 
     private SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy kk:mm");
-    private TimelapseClient client;
     private ScheduledFuture scheduledFuture;
-    private ScheduledExecutorService executor;
     private CameraState cameraState;
     private TextView allume;
     private TextView veille;
@@ -34,32 +35,18 @@ public class CameraActivity extends AppCompatActivity {
     private final Runnable getCameraState = new Runnable() {
         @Override
         public void run() {
-            client.getCameraState(new Callback<CameraState>() {
-                @Override
-                public void onSuccess(int i, final CameraState cameraState) {
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            CameraActivity.this.cameraState = cameraState;
-                            updateCameraView(cameraState);
-                            veilleButton.setText(cameraState.isSleeping() ? "REVEILLER" : "METTRE EN VEILLE");
-                        }
-                    });
-                }
-
-                @Override
-                public void onError(int i, final ErrorResponse errorResponse) {
-                    /*
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            Snackbar.make(viewpager, "Une erreur est survenue:" + errorResponse.getMessage(),
-                                    Snackbar.LENGTH_SHORT).show();
-                        }
-                    });
-                    */
-                }
-            });
+            final TimelapseResponse<CameraState> response = getClient().getCameraState();
+            if (response.isSuccessful()) {
+                final CameraState state = response.getData();
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        CameraActivity.this.cameraState = state;
+                        updateCameraView(cameraState);
+                        veilleButton.setText(cameraState.isSleeping() ? "REVEILLER" : "METTRE EN VEILLE");
+                    }
+                });
+            }
         }
     };
 
@@ -72,15 +59,13 @@ public class CameraActivity extends AppCompatActivity {
         veille = (TextView) findViewById(R.id.Camera_Veille);
         Signe_vie = (TextView) findViewById(R.id.signedevie);
         veilleButton = findViewById(R.id.Mise_en_veille);
-        client = ClientSingleton.getClient();
-        executor = Executors.newSingleThreadScheduledExecutor();
     }
 
     @Override
     protected void onStart() {
         super.onStart();
         long period = 4;
-        scheduledFuture = executor.scheduleAtFixedRate(getCameraState, period, period, TimeUnit.SECONDS);
+        scheduledFuture = ((ScheduledExecutorService)getExecutor()).scheduleAtFixedRate(getCameraState, period, period, TimeUnit.SECONDS);
     }
 
     @Override
@@ -127,30 +112,28 @@ public class CameraActivity extends AppCompatActivity {
         onCommandClick(Command.TURN_OFF);
     }
 
-    private void onCommandClick(Command command) {
-        client.postCommand(command, new Callback<Command>() {
+    private void onCommandClick(final Command command) {
+        getExecutor().execute(new Runnable() {
             @Override
-            public void onSuccess(int i, Command command) {
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        Snackbar.make(veilleButton, "La commande a bien été envoyée. Attendez 10s pour voir le changement", Snackbar.LENGTH_LONG).show();
-                    }
-                });
-            }
-
-            @Override
-            public void onError(int i, ErrorResponse errorResponse) {
-                 /*
+            public void run() {
+                TimelapseResponse response = getClient().postCommand(command);
+                if (response.isSuccessful()) {
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-                            Snackbar.make(viewpager, "Une erreur est survenue:" + errorResponse.getMessage(),
-                                    Snackbar.LENGTH_SHORT).show();
+                            Snackbar.make(veilleButton, "La commande a bien été envoyée. Attendez 10s pour voir le changement", Snackbar.LENGTH_LONG).show();
                         }
                     });
-                    */
+                } else {
+                    Toast.makeText(CameraActivity.this, "Erreur: " + response.getError().getMessage(), Toast.LENGTH_SHORT).show();
+                }
             }
         });
+    }
+
+
+    @Override
+    Executor initializeExecutor() {
+        return Executors.newSingleThreadScheduledExecutor();
     }
 }

@@ -24,37 +24,34 @@ import android.widget.Toast;
 
 import com.app4.project.timelapse.api.client.Callback;
 import com.app4.project.timelapse.api.client.TimelapseAsyncClient;
+import com.app4.project.timelapse.api.client.TimelapseBasicClient;
 import com.app4.project.timelapse.api.client.TimelapseClient;
 import com.app4.project.timelapse.api.client.TimelapseFakeClient;
+import com.app4.project.timelapse.api.client.TimelapseResponse;
 import com.app4.project.timelapse.model.ErrorResponse;
 import com.app4.project.timelapse.model.Execution;
 import com.app4.project.timelapse.model.GlobalState;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
+import java.util.concurrent.Executor;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends TimelapseActivity {
 
     public static final String EXECUTION_ID_KEY = "EXECUTION_ID_KEY";
     private List<Execution> executions = new ArrayList<>();
     private SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy kk:mm");
     RecyclerView recyclerView;
     private ExecutionAdapter adapter;
-    private TimelapseClient client;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        client  = ClientSingleton.getClient();
-        /*
-        executions.add(new Execution(System.currentTimeMillis(), System.currentTimeMillis() + 10000,0, 100, "FLEUR"));
-        executions.add(new Execution(System.currentTimeMillis() + 2032040, System.currentTimeMillis() + 10000,0, 100, "Eclipse"));
-        executions.add(new Execution(System.currentTimeMillis() + 48324235325, System.currentTimeMillis() + 10000,0, 100, "Pop corn qui explose"));
-        executions.add(new Execution(System.currentTimeMillis() + 8238385, System.currentTimeMillis() + 10000,0, 100, "SATELLITE"));
-        */
+
         recyclerView = findViewById(R.id.recyclerview);
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -187,36 +184,34 @@ public class MainActivity extends AppCompatActivity {
     protected void onStart() {
         super.onStart();
         //Toast.makeText(this, "SISI", Toast.LENGTH_SHORT).show();
-        client.getGlobalState(new Callback<GlobalState>() {
+        getExecutor().execute(new Runnable() {
             @Override
-            public void onSuccess(int i, final GlobalState globalState) {
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        // RecyclerView.setHasFixedSize(true);
-
-                        // use a linear layout manager
-                        LinearLayoutManager mLayoutManager = new LinearLayoutManager(MainActivity.this);
-                        recyclerView.setLayoutManager(mLayoutManager);
-                        executions.clear();
-                        for (Execution e : globalState.getExecutions()) {
-                            executions.add(e);
+            public void run() {
+                TimelapseResponse<GlobalState> response = getClient().getGlobalState();
+                if (response.isSuccessful()) {
+                    final GlobalState globalState = response.getData();
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            // RecyclerView.setHasFixedSize(true);
+                            // use a linear layout manager
+                            LinearLayoutManager mLayoutManager = new LinearLayoutManager(MainActivity.this);
+                            recyclerView.setLayoutManager(mLayoutManager);
+                            executions.clear();
+                            executions.addAll(Arrays.asList(globalState.getExecutions()));
+                            // specify an adapter (see also next example)
+                            adapter = new ExecutionAdapter();
+                            recyclerView.setAdapter(adapter);
                         }
-                        // specify an adapter (see also next example)
-                        adapter = new ExecutionAdapter();
-                        recyclerView.setAdapter(adapter);
-                    }
-                });
-            }
-
-            @Override
-            public void onError(int i, ErrorResponse errorResponse) {
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        Toast.makeText(MainActivity.this, "Erreur lors du chargement des Executions", Toast.LENGTH_SHORT).show();
-                    }
-                });
+                    });
+                } else {
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            Toast.makeText(MainActivity.this, "Erreur lors du chargement des Executions", Toast.LENGTH_SHORT).show();
+                        }
+                    });
+                }
             }
         });
     }
