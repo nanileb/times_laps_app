@@ -1,6 +1,7 @@
 package com.example.anthony.timelapscontroller;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.support.annotation.NonNull;
@@ -11,6 +12,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
+import android.widget.Toast;
 
 import com.app4.project.timelapse.api.client.Callback;
 import com.app4.project.timelapse.api.client.TimelapseBasicClient;
@@ -75,7 +77,7 @@ public class ViewPageAdapter extends PagerAdapter {
         final ImageView imageView = (ImageView) view.findViewById(R.id.imageView);
         final ProgressBar progressBar = (ProgressBar) view.findViewById(R.id.imageProgressBar);
         progressBar.setVisibility(View.VISIBLE);
-        //TODO (pour Nelson) les images sont coupees
+
         executor.execute(new Runnable() {
             @Override
             public void run() {
@@ -93,10 +95,20 @@ public class ViewPageAdapter extends PagerAdapter {
                         @Override
                         public void run() {
                             imageView.setImageResource(R.drawable.error);
-                            progressBar.setVisibility(View.INVISIBLE);
+                            progressBar.setVisibility(View.GONE);
                         }
                     });
                 }
+            }
+        });
+
+        view.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(activity,PictureViewActivity.class);
+                intent.putExtra("executionId", executionId);
+                intent.putExtra("imageId", position);
+                activity.startActivity(intent);
             }
         });
 

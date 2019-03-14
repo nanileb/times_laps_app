@@ -67,7 +67,16 @@
                 android:layout_centerHorizontal="true"
                 android:layout_marginBottom="20dp"
                 />
+
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_above="@id/voir_video"
+                android:layout_centerHorizontal="true"
+                android:text="Aller à l'image... "
+                android:onClick="goToImage"/>
         </RelativeLayout>
+
 
     </LinearLayout>
 

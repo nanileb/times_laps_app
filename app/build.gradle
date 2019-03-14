@@ -31,6 +31,8 @@ dependencies {
     implementation 'org.jcodec:jcodec:0.2.2'
     implementation 'org.jcodec:jcodec-android:0.2.2'
     testImplementation 'junit:junit:4.12'
+    implementation 'com.davemorrissey.labs:subsampling-scale-image-view:3.10.0'
+
     androidTestImplementation 'com.android.support.test:runner:1.0.2'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
 }

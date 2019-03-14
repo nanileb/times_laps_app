@@ -18,6 +18,7 @@ import android.view.animation.AnimationUtils;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.ViewGroup;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -46,6 +47,7 @@ public class MainActivity extends TimelapseActivity {
     private SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy kk:mm");
     RecyclerView recyclerView;
     private ExecutionAdapter adapter;
+    private ProgressBar progressbar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,6 +55,7 @@ public class MainActivity extends TimelapseActivity {
         setContentView(R.layout.activity_main);
 
         recyclerView = findViewById(R.id.recyclerview);
+        progressbar = findViewById(R.id.Progressbar);
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -149,7 +152,7 @@ public class MainActivity extends TimelapseActivity {
                     startActivity(intent);
                 }
             });
-            Log.e("caca", "ttt" + i);
+
             if (i % 2 == 0) {
                 //view.setBackgroundColor(activity.getColor(R.color.colorPrimaryDark));
                 myViewHolder.root.setBackgroundResource(R.color.ColorView2);
@@ -202,12 +205,18 @@ public class MainActivity extends TimelapseActivity {
                             // specify an adapter (see also next example)
                             adapter = new ExecutionAdapter();
                             recyclerView.setAdapter(adapter);
+
+
+                            progressbar.setVisibility(View.GONE);
                         }
                     });
                 } else {
+
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
+
+                            progressbar.setVisibility(View.GONE);
                             Toast.makeText(MainActivity.this, "Erreur lors du chargement des Executions", Toast.LENGTH_SHORT).show();
                         }
                     });
